@@ -79,7 +79,7 @@ class _LandingPageState extends State<LandingPage>
     }
     final msg = Uri.encodeComponent(
       '¡Hola! Soy *$nombre* y confirmo mi asistencia a la '
-      'Clausura del Programa de Educación Emocional — Proyecto Libélula 🪲✨\n'
+      'Clausura del Programa de Educación Emocional — Proyecto Libélula\n'
       'Fecha: Lunes 22 de junio 2026 · 1:30 pm',
     );
     final uri = Uri.parse('https://wa.me/573118888534?text=$msg');

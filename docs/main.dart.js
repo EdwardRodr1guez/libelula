@@ -74244,7 +74244,7 @@ for(;;)switch(s){case 0:n=B.d.lz(p.d.a.a)
 if(n.length===0){p.ak(new A.acY(p))
 A.FC(B.fq,new A.acZ(p),t.P)
 s=1
-break}o=A.k4("https://wa.me/573118888534?text="+A.Cf(2,"\xa1Hola! Soy *"+n+"* y confirmo mi asistencia a la Clausura del Programa de Educaci\xf3n Emocional \u2014 Proyecto Lib\xe9lula \ud83e\udeb2\u2728\nFecha: Lunes 22 de junio 2026 \xb7 1:30 pm",B.a4,!1),0,null)
+break}o=A.k4("https://wa.me/573118888534?text="+A.Cf(2,"\xa1Hola! Soy *"+n+"* y confirmo mi asistencia a la Clausura del Programa de Educaci\xf3n Emocional \u2014 Proyecto Lib\xe9lula\nFecha: Lunes 22 de junio 2026 \xb7 1:30 pm",B.a4,!1),0,null)
 s=5
 return A.S(A.al5(o),$async$px)
 case 5:s=b?3:4
