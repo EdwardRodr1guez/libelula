@@ -43,7 +43,7 @@ class _LandingPageState extends State<LandingPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _nameCtrl = TextEditingController();
   final ScrollController _scrollCtrl = ScrollController();
-  bool _nameError = false;
+  final bool _nameError = false;
   double _parallaxOffset = 0;
 
   late final AnimationController _fadeCtrl;
@@ -71,16 +71,8 @@ class _LandingPageState extends State<LandingPage>
   }
 
   Future<void> _confirmar() async {
-    final nombre = _nameCtrl.text.trim();
-    if (nombre.isEmpty) {
-      setState(() => _nameError = true);
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _nameError = false);
-      });
-      return;
-    }
     final msg = Uri.encodeComponent(
-      '¡Hola! Soy *$nombre* y confirmo mi asistencia a la '
+      '¡Hola! confirmo mi asistencia a la '
       'Clausura del Programa de Educación Emocional — Proyecto Libélula\n'
       'Fecha: Lunes 22 de junio 2026 · 1:30 pm',
     );
@@ -231,8 +223,7 @@ class _BrandBar extends StatelessWidget {
     return Row(
       children: [
         _logoBox('assets/logo1.jpeg', 72 * 2),
-        const SizedBox(width: 14),
-        _logoBox('assets/logo2.jpeg', 54),
+
         const Spacer(),
         const Text(
           'Clausura · 2026',
