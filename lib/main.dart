@@ -26,9 +26,10 @@ class LibelulaApp extends StatelessWidget {
 // ── Colores ────────────────────────────────────────────────────────────
 const Color kGold = Color(0xFFC9A84C);
 const Color kGoldLight = Color(0xFFE8C97A);
-const Color kDark = Color(0xFF0D0D0D);
-const Color kDark2 = Color(0xFF1A1A2E);
-const Color kTextMuted = Color(0xFFA89F8C);
+const Color kBackground = Color(0xFFF7F2E8);
+const Color kSurface = Color(0xFFFFFDF8);
+const Color kInk = Color(0xFF2B2620);
+const Color kTextMuted = Color(0xFF7E7668);
 
 // ── Landing Page ──────────────────────────────────────────────────────
 class LandingPage extends StatefulWidget {
@@ -76,47 +77,46 @@ class _LandingPageState extends State<LandingPage>
     final msg = Uri.encodeComponent(
       '¡Hola! Soy *$nombre* y confirmo mi asistencia a la Clausura del Proyecto Libélula. 🪲✨',
     );
-    final uri = Uri.parse('https://wa.me/573103799897?text=$msg');
+    final uri = Uri.parse('https://wa.me/573118888534?text=$msg');
     if (await canLaunchUrl(uri)) await launchUrl(uri);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kDark,
+      backgroundColor: kBackground,
       body: Stack(
         children: [
-          // Fondo degradado
           Container(
             decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(-0.6, 0),
-                radius: 1.2,
-                colors: [Color(0xFF1A1A3E), kDark],
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFFFFBF4), kBackground],
               ),
             ),
           ),
-          // Partículas
+          const _SoftOrbs(),
           const ParticlesLayer(),
-          // Contenido
           SafeArea(
             child: FadeTransition(
               opacity: _fadeAnim,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 40),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 520),
+                    constraints: const BoxConstraints(maxWidth: 760),
                     child: Column(
                       children: [
-                        // Tag
+                        const _BrandBar(),
+                        const SizedBox(height: 18),
+                        _HeroDetailImage(),
+                        const SizedBox(height: 18),
                         _Tag(),
-                        const SizedBox(height: 20),
-                        // Título
+                        const SizedBox(height: 16),
                         ShaderMask(
                           shaderCallback: (bounds) => const LinearGradient(
-                            colors: [kGoldLight, kGold, Color(0xFFA07830)],
+                            colors: [Color(0xFFB8892C), kGold, Color(0xFF6E531A)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ).createShader(bounds),
@@ -124,10 +124,10 @@ class _LandingPageState extends State<LandingPage>
                             'Proyecto\nLibélula',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 52,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 54,
+                              fontWeight: FontWeight.w800,
                               color: Colors.white,
-                              height: 1.1,
+                              height: 1.05,
                             ),
                           ),
                         ),
@@ -137,21 +137,21 @@ class _LandingPageState extends State<LandingPage>
                           style: TextStyle(
                             fontSize: 16,
                             color: kTextMuted,
-                            letterSpacing: 1.5,
-                            fontWeight: FontWeight.w300,
+                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                        const SizedBox(height: 28),
-                        // Divisor
+                        const SizedBox(height: 22),
                         _GoldDivider(),
-                        const SizedBox(height: 28),
-                        // Card
+                        const SizedBox(height: 22),
                         _InvitationCard(
                           nameController: _nameController,
                           nameError: _nameError,
                           onConfirm: _confirmar,
                         ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 18),
+                        const _FooterBanner(),
+                        const SizedBox(height: 18),
                         const Text(
                           'Proyecto Libélula · 2026',
                           style: TextStyle(
@@ -182,6 +182,7 @@ class _Tag extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: kGold.withOpacity(0.7)),
         borderRadius: BorderRadius.circular(100),
+        color: Colors.white.withOpacity(0.72),
       ),
       child: const Text(
         '✦  Evento especial',
@@ -248,27 +249,28 @@ class _InvitationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        border: Border.all(color: kGold.withOpacity(0.2)),
+        color: kSurface.withOpacity(0.96),
+        border: Border.all(color: kGold.withOpacity(0.22)),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: kGold.withOpacity(0.06),
-            blurRadius: 60,
+            color: kGold.withOpacity(0.10),
+            blurRadius: 50,
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 40,
-            offset: const Offset(0, 20),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 30,
+            offset: const Offset(0, 14),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Placeholder de imagen
-          _HeroImagePlaceholder(),
+          const _LogoStrip(),
+          const SizedBox(height: 18),
+          _HeroDetailImage(),
           const SizedBox(height: 24),
           // Info del evento
           _EventRow(icon: '📅', label: 'Próximamente', value: '2026'),
@@ -291,13 +293,13 @@ class _InvitationCard extends StatelessWidget {
           // Input
           TextField(
             controller: nameController,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: const TextStyle(color: kInk, fontSize: 16),
             onSubmitted: (_) => onConfirm(),
             decoration: InputDecoration(
               hintText: '¿Cómo te llamas?',
               hintStyle: const TextStyle(color: kTextMuted),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.06),
+              fillColor: const Color(0xFFFFFCF8),
               contentPadding: const EdgeInsets.symmetric(
                   horizontal: 18, vertical: 16),
               enabledBorder: OutlineInputBorder(
@@ -305,7 +307,7 @@ class _InvitationCard extends StatelessWidget {
                 borderSide: BorderSide(
                   color: nameError
                       ? const Color(0xFFE05C5C)
-                      : kGold.withOpacity(0.25),
+                      : kGold.withOpacity(0.28),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -347,36 +349,129 @@ class _InvitationCard extends StatelessWidget {
   }
 }
 
-// ── Hero image placeholder ────────────────────────────────────────────
-class _HeroImagePlaceholder extends StatelessWidget {
+// ── Hero image y logos ────────────────────────────────────────────────
+class _HeroDetailImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 240,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: kGold.withOpacity(0.3),
-          style: BorderStyle.solid,
+          color: kGold.withOpacity(0.22),
         ),
-      ),
-      // Para usar tu imagen, reemplaza este child por:
-      // child: ClipRRect(
-      //   borderRadius: BorderRadius.circular(16),
-      //   child: Image.asset('assets/hero.jpg', fit: BoxFit.cover),
-      // ),
-      child: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('🖼️', style: TextStyle(fontSize: 40)),
-          SizedBox(height: 8),
-          Text(
-            'Agrega tu imagen aquí',
-            style: TextStyle(color: kTextMuted, fontSize: 13),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.asset(
+          'assets/landscape.jpeg',
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
+      ),
+    );
+  }
+}
+
+class _BrandBar extends StatelessWidget {
+  const _BrandBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _MiniLogo(asset: 'assets/logo1.jpeg'),
+        const SizedBox(width: 12),
+        _MiniLogo(asset: 'assets/logo2.jpeg'),
+        const Spacer(),
+        const Text(
+          'Clausura',
+          style: TextStyle(
+            color: kTextMuted,
+            fontSize: 12,
+            letterSpacing: 2,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LogoStrip extends StatelessWidget {
+  const _LogoStrip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(child: _MiniLogo(asset: 'assets/logo1.jpeg', height: 68)),
+        SizedBox(width: 12),
+        Expanded(child: _MiniLogo(asset: 'assets/logo2.jpeg', height: 68)),
+      ],
+    );
+  }
+}
+
+class _MiniLogo extends StatelessWidget {
+  const _MiniLogo({required this.asset, this.height = 42});
+
+  final String asset;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: kGold.withOpacity(0.16)),
+      ),
+      child: Image.asset(asset, fit: BoxFit.contain),
+    );
+  }
+}
+
+class _FooterBanner extends StatelessWidget {
+  const _FooterBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 110,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kGold.withOpacity(0.16)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+          'assets/footer.jpeg',
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
       ),
     );
   }
@@ -403,7 +498,7 @@ class _EventRow extends StatelessWidget {
         Text(
           value,
           style: const TextStyle(
-              color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+              color: kInk, fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -526,7 +621,7 @@ class _ParticlesPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     for (final p in particles) {
       final paint = Paint()
-        ..color = kGoldLight.withOpacity(p.opacity)
+        ..color = kGold.withOpacity(p.opacity * 0.20)
         ..style = PaintingStyle.fill;
       canvas.drawCircle(
           Offset(p.x * size.width, p.y * size.height), p.size, paint);
@@ -535,5 +630,42 @@ class _ParticlesPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ParticlesPainter old) => true;
+}
+
+class _SoftOrbs extends StatelessWidget {
+  const _SoftOrbs();
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Stack(
+        children: [
+          Positioned(
+            top: -80,
+            right: -40,
+            child: _orb(180),
+          ),
+          Positioned(
+            top: 220,
+            left: -70,
+            child: _orb(140),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _orb(double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [kGold.withOpacity(0.18), Colors.transparent],
+        ),
+      ),
+    );
+  }
 }
 
