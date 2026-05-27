@@ -25,12 +25,12 @@ class LibelulaApp extends StatelessWidget {
 }
 
 // ── Paleta azul / blanco ──────────────────────────────────────────────
-const Color kBlue      = Color(0xFF1565C0);
-const Color kBlueMid   = Color(0xFF1E88E5);
+const Color kBlue = Color(0xFF1565C0);
+const Color kBlueMid = Color(0xFF1E88E5);
 const Color kBlueLight = Color(0xFFE3F2FD);
-const Color kWhite     = Colors.white;
-const Color kInk       = Color(0xFF0D1B2A);
-const Color kMuted     = Color(0xFF607D8B);
+const Color kWhite = Colors.white;
+const Color kInk = Color(0xFF0D1B2A);
+const Color kMuted = Color(0xFF607D8B);
 
 // ── Landing Page ──────────────────────────────────────────────────────
 class LandingPage extends StatefulWidget {
@@ -42,19 +42,20 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _nameCtrl = TextEditingController();
-  final ScrollController _scrollCtrl   = ScrollController();
+  final ScrollController _scrollCtrl = ScrollController();
   bool _nameError = false;
   double _parallaxOffset = 0;
 
   late final AnimationController _fadeCtrl;
-  late final Animation<double>   _fadeAnim;
+  late final Animation<double> _fadeAnim;
 
   @override
   void initState() {
     super.initState();
     _fadeCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1000))
-      ..forward();
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..forward();
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
     _scrollCtrl.addListener(() {
       if (mounted) setState(() => _parallaxOffset = _scrollCtrl.offset * 0.35);
@@ -73,8 +74,9 @@ class _LandingPageState extends State<LandingPage>
     final nombre = _nameCtrl.text.trim();
     if (nombre.isEmpty) {
       setState(() => _nameError = true);
-      Future.delayed(const Duration(seconds: 2),
-          () { if (mounted) setState(() => _nameError = false); });
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _nameError = false);
+      });
       return;
     }
     final msg = Uri.encodeComponent(
@@ -115,7 +117,9 @@ class _LandingPageState extends State<LandingPage>
                         // TÍTULO
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 18),
+                            horizontal: 20,
+                            vertical: 18,
+                          ),
                           child: Column(
                             children: [
                               const _ChipTag(label: '✦  Evento especial'),
@@ -164,7 +168,7 @@ class _LandingPageState extends State<LandingPage>
                         const SizedBox(height: 24),
                         // FOOTER
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
                           child: _FooterBanner(),
                         ),
                         const SizedBox(height: 28),
@@ -174,7 +178,10 @@ class _LandingPageState extends State<LandingPage>
                             'Proyecto Libélula · 2026',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontSize: 12, color: kMuted, letterSpacing: 1),
+                              fontSize: 12,
+                              color: kMuted,
+                              letterSpacing: 1,
+                            ),
                           ),
                         ),
                       ],
@@ -204,8 +211,12 @@ class _ParallaxHero extends StatelessWidget {
           maxHeight: h + 120,
           child: Transform.translate(
             offset: Offset(0, -offset),
-            child: Image.asset('assets/landscape2.jpeg',
-                fit: BoxFit.cover, width: double.infinity, height: h + 120),
+            child: Image.asset(
+              'assets/landscape2.jpeg',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: h + 120,
+            ),
           ),
         ),
       ),
@@ -219,16 +230,19 @@ class _BrandBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _logoBox('assets/logo1.jpeg', 72),
+        _logoBox('assets/logo1.jpeg', 72 * 2),
         const SizedBox(width: 14),
         _logoBox('assets/logo2.jpeg', 54),
         const Spacer(),
-        const Text('Clausura · 2026',
-            style: TextStyle(
-                color: kMuted,
-                fontSize: 12,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.w500)),
+        const Text(
+          'Clausura · 2026',
+          style: TextStyle(
+            color: kMuted,
+            fontSize: 12,
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ],
     );
   }
@@ -243,9 +257,10 @@ class _BrandBar extends StatelessWidget {
         border: Border.all(color: kBlueLight),
         boxShadow: [
           BoxShadow(
-              color: kBlue.withOpacity(0.10),
-              blurRadius: 14,
-              offset: const Offset(0, 4))
+            color: kBlue.withOpacity(0.10),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Image.asset(asset, fit: BoxFit.contain),
@@ -266,12 +281,15 @@ class _ChipTag extends StatelessWidget {
         borderRadius: BorderRadius.circular(100),
         border: Border.all(color: kBlueMid.withOpacity(0.35)),
       ),
-      child: Text(label,
-          style: const TextStyle(
-              fontSize: 11,
-              letterSpacing: 2.5,
-              color: kBlue,
-              fontWeight: FontWeight.w600)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 11,
+          letterSpacing: 2.5,
+          color: kBlue,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
@@ -286,24 +304,29 @@ class _BlueDivider extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-              child: Container(
-                  height: 1.5,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                    Colors.transparent,
-                    kBlueMid.withOpacity(0.4)
-                  ])))),
+            child: Container(
+              height: 1.5,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, kBlueMid.withOpacity(0.4)],
+                ),
+              ),
+            ),
+          ),
           const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 14),
-              child: Text('🪲', style: TextStyle(fontSize: 20))),
+            padding: EdgeInsets.symmetric(horizontal: 14),
+            child: Text('🪲', style: TextStyle(fontSize: 20)),
+          ),
           Expanded(
-              child: Container(
-                  height: 1.5,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                    kBlueMid.withOpacity(0.4),
-                    Colors.transparent
-                  ])))),
+            child: Container(
+              height: 1.5,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [kBlueMid.withOpacity(0.4), Colors.transparent],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -312,10 +335,11 @@ class _BlueDivider extends StatelessWidget {
 
 // ── Card de invitación ────────────────────────────────────────────────
 class _InvitationCard extends StatelessWidget {
-  const _InvitationCard(
-      {required this.nameCtrl,
-      required this.nameError,
-      required this.onConfirm});
+  const _InvitationCard({
+    required this.nameCtrl,
+    required this.nameError,
+    required this.onConfirm,
+  });
   final TextEditingController nameCtrl;
   final bool nameError;
   final VoidCallback onConfirm;
@@ -330,9 +354,10 @@ class _InvitationCard extends StatelessWidget {
         border: Border.all(color: kBlue.withOpacity(0.12)),
         boxShadow: [
           BoxShadow(
-              color: kBlue.withOpacity(0.08),
-              blurRadius: 40,
-              offset: const Offset(0, 12))
+            color: kBlue.withOpacity(0.08),
+            blurRadius: 40,
+            offset: const Offset(0, 12),
+          ),
         ],
       ),
       child: Column(
@@ -341,8 +366,12 @@ class _InvitationCard extends StatelessWidget {
           // Imagen interior (landscape original)
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.asset('assets/landscape.jpeg',
-                width: double.infinity, height: 220, fit: BoxFit.cover),
+            child: Image.asset(
+              'assets/landscape.jpeg',
+              width: double.infinity,
+              height: 220,
+              fit: BoxFit.cover,
+            ),
           ),
           const SizedBox(height: 22),
 
@@ -350,16 +379,20 @@ class _InvitationCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-                color: kBlueLight,
-                borderRadius: BorderRadius.circular(14)),
+              color: kBlueLight,
+              borderRadius: BorderRadius.circular(14),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
-                Text('Estimado equipo,',
-                    style: TextStyle(
-                        color: kBlue,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15)),
+                Text(
+                  'Estimado equipo,',
+                  style: TextStyle(
+                    color: kBlue,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
                 SizedBox(height: 8),
                 Text(
                   'Es un gusto invitarlos a la clausura del Programa de '
@@ -376,31 +409,34 @@ class _InvitationCard extends StatelessWidget {
 
           // Detalles
           const _EventDetail(
-              icon: '📅',
-              label: 'Fecha',
-              value: 'Lunes 22 de junio 2026'),
+            icon: '📅',
+            label: 'Fecha',
+            value: 'Lunes 22 de junio 2026',
+          ),
           const SizedBox(height: 10),
           const _EventDetail(
-              icon: '🕐', label: 'Hora', value: '1:30 pm – 4:00 pm'),
+            icon: '🕐',
+            label: 'Hora',
+            value: '1:30 pm – 4:00 pm',
+          ),
           const SizedBox(height: 10),
           const _EventDetail(
             icon: '📍',
             label: 'Lugar',
-            value:
-                'Auditorio 2° piso · Hospital de Bosa\n(Cl. 73 Sur #KR 103)',
+            value: 'Auditorio 2° piso · Hospital de Bosa\n(Cl. 73 Sur #KR 103)',
           ),
           const SizedBox(height: 20),
 
           // Deadline
           Container(
             width: double.infinity,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: const Color(0xFFFFECB3),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                  color: const Color(0xFFFFB300).withOpacity(0.5)),
+                color: const Color(0xFFFFB300).withOpacity(0.5),
+              ),
             ),
             child: const Row(
               children: [
@@ -410,9 +446,10 @@ class _InvitationCard extends StatelessWidget {
                   child: Text(
                     'Por favor confirme asistencia antes del 5 de junio 2026',
                     style: TextStyle(
-                        color: Color(0xFF7B4F00),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600),
+                      color: Color(0xFF7B4F00),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -421,12 +458,15 @@ class _InvitationCard extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Campo nombre
-          const Text('TU NOMBRE',
-              style: TextStyle(
-                  fontSize: 11,
-                  letterSpacing: 2.5,
-                  color: kBlue,
-                  fontWeight: FontWeight.w600)),
+          const Text(
+            'TU NOMBRE',
+            style: TextStyle(
+              fontSize: 11,
+              letterSpacing: 2.5,
+              color: kBlue,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: nameCtrl,
@@ -438,18 +478,20 @@ class _InvitationCard extends StatelessWidget {
               filled: true,
               fillColor: kBlueLight.withOpacity(0.5),
               contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 18, vertical: 16),
+                horizontal: 18,
+                vertical: 16,
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                    color: nameError
-                        ? const Color(0xFFE05C5C)
-                        : kBlueMid.withOpacity(0.3)),
+                  color: nameError
+                      ? const Color(0xFFE05C5C)
+                      : kBlueMid.withOpacity(0.3),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: kBlue, width: 1.8),
+                borderSide: const BorderSide(color: kBlue, width: 1.8),
               ),
             ),
           ),
@@ -461,20 +503,27 @@ class _InvitationCard extends StatelessWidget {
             height: 54,
             child: ElevatedButton.icon(
               onPressed: onConfirm,
-              icon: const Icon(Icons.chat_rounded,
-                  size: 20, color: Colors.white),
-              label: const Text('Confirmar asistencia',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.4)),
+              icon: const Icon(
+                Icons.chat_rounded,
+                size: 20,
+                color: Colors.white,
+              ),
+              label: const Text(
+                'Confirmar asistencia',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.4,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kBlue,
                 foregroundColor: kWhite,
                 elevation: 6,
                 shadowColor: kBlue.withOpacity(0.4),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
             ),
           ),
@@ -486,8 +535,11 @@ class _InvitationCard extends StatelessWidget {
 
 // ── Event detail row ──────────────────────────────────────────────────
 class _EventDetail extends StatelessWidget {
-  const _EventDetail(
-      {required this.icon, required this.label, required this.value});
+  const _EventDetail({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
   final String icon, label, value;
   @override
   Widget build(BuildContext context) {
@@ -502,12 +554,16 @@ class _EventDetail extends StatelessWidget {
               style: const TextStyle(fontSize: 14, height: 1.5),
               children: [
                 TextSpan(
-                    text: '$label: ',
-                    style: const TextStyle(color: kMuted)),
+                  text: '$label: ',
+                  style: const TextStyle(color: kMuted),
+                ),
                 TextSpan(
-                    text: value,
-                    style: const TextStyle(
-                        color: kInk, fontWeight: FontWeight.w600)),
+                  text: value,
+                  style: const TextStyle(
+                    color: kInk,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
           ),
@@ -531,27 +587,38 @@ class _PatrocinadoresSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text('PATROCINADORES',
-              style: TextStyle(
-                  fontSize: 11,
-                  letterSpacing: 3,
-                  color: kBlue,
-                  fontWeight: FontWeight.w700)),
+          const Text(
+            'PATROCINADORES',
+            style: TextStyle(
+              fontSize: 11,
+              letterSpacing: 3,
+              color: kBlue,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset('assets/patrocinadores1.jpeg',
-                        height: 90, fit: BoxFit.contain)),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/patrocinadores1.jpeg',
+                    height: 90,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset('assets/patrocinadores2.jpeg',
-                        height: 90, fit: BoxFit.contain)),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/patrocinadores2.jpeg',
+                    height: 90,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ],
           ),
@@ -567,8 +634,13 @@ class _FooterBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Image.asset('assets/footer.jpeg',
-          width: double.infinity, height: 120, fit: BoxFit.cover),
+      child: Image.asset(
+        'assets/footer.jpeg',
+        width: double.infinity,
+
+        height: 120,
+        fit: BoxFit.fitWidth,
+      ),
     );
   }
 }
@@ -590,8 +662,13 @@ class _BackgroundOrbs extends StatelessWidget {
     );
   }
 
-  Widget _orb(double? top, double? bottom, double? right, double? left,
-      double size) {
+  Widget _orb(
+    double? top,
+    double? bottom,
+    double? right,
+    double? left,
+    double size,
+  ) {
     return Positioned(
       top: top,
       bottom: bottom,
@@ -602,8 +679,7 @@ class _BackgroundOrbs extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: RadialGradient(
-              colors: [kBlueLight, Colors.transparent]),
+          gradient: RadialGradient(colors: [kBlueLight, Colors.transparent]),
         ),
       ),
     );
@@ -628,47 +704,60 @@ class _ParticlesLayerState extends State<ParticlesLayer>
     super.initState();
     for (int i = 0; i < 18; i++) _particles.add(_Particle.random(_rng));
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(seconds: 1))
-      ..repeat();
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat();
     _ctrl.addListener(() {
-      if (mounted) setState(() { for (var p in _particles) p.update(); });
+      if (mounted)
+        setState(() {
+          for (var p in _particles) p.update();
+        });
     });
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => CustomPaint(
-      painter: _ParticlesPainter(_particles),
-      child: const SizedBox.expand());
+    painter: _ParticlesPainter(_particles),
+    child: const SizedBox.expand(),
+  );
 }
 
 class _Particle {
   double x, y, size, speed, opacity, angle, drift;
-  _Particle(
-      {required this.x,
-      required this.y,
-      required this.size,
-      required this.speed,
-      required this.opacity,
-      required this.angle,
-      required this.drift});
+  _Particle({
+    required this.x,
+    required this.y,
+    required this.size,
+    required this.speed,
+    required this.opacity,
+    required this.angle,
+    required this.drift,
+  });
   factory _Particle.random(Random rng) => _Particle(
-      x: rng.nextDouble(),
-      y: rng.nextDouble(),
-      size: rng.nextDouble() * 7 + 5,        // 5–12 px
-      speed: rng.nextDouble() * 0.0015 + 0.0006,
-      opacity: rng.nextDouble() * 0.35 + 0.12,
-      angle: rng.nextDouble() * 2 * pi,
-      drift: (rng.nextDouble() - 0.5) * 0.0006);
+    x: rng.nextDouble(),
+    y: rng.nextDouble(),
+    size: rng.nextDouble() * 7 + 5, // 5–12 px
+    speed: rng.nextDouble() * 0.0015 + 0.0006,
+    opacity: rng.nextDouble() * 0.35 + 0.12,
+    angle: rng.nextDouble() * 2 * pi,
+    drift: (rng.nextDouble() - 0.5) * 0.0006,
+  );
   void update() {
     y -= speed;
     x += drift;
     angle += 0.03;
-    if (y < -0.05) { y = 1.05; x = Random().nextDouble(); }
+    if (y < -0.05) {
+      y = 1.05;
+      x = Random().nextDouble();
+    }
     if (x < -0.05) x = 1.05;
-    if (x > 1.05)  x = -0.05;
+    if (x > 1.05) x = -0.05;
   }
 }
 
@@ -687,15 +776,11 @@ class _ParticlesPainter extends CustomPainter {
       bodyPaint,
     );
     // alas superiores (2 elipses)
-    canvas.drawOval(
-        const Rect.fromLTWH(-0.7, -0.55, 0.62, 0.28), wingPaint);
-    canvas.drawOval(
-        const Rect.fromLTWH(0.08, -0.55, 0.62, 0.28), wingPaint);
+    canvas.drawOval(const Rect.fromLTWH(-0.7, -0.55, 0.62, 0.28), wingPaint);
+    canvas.drawOval(const Rect.fromLTWH(0.08, -0.55, 0.62, 0.28), wingPaint);
     // alas inferiores
-    canvas.drawOval(
-        const Rect.fromLTWH(-0.55, -0.22, 0.47, 0.22), wingPaint);
-    canvas.drawOval(
-        const Rect.fromLTWH(0.08, -0.22, 0.47, 0.22), wingPaint);
+    canvas.drawOval(const Rect.fromLTWH(-0.55, -0.22, 0.47, 0.22), wingPaint);
+    canvas.drawOval(const Rect.fromLTWH(0.08, -0.22, 0.47, 0.22), wingPaint);
   }
 
   @override
@@ -703,7 +788,7 @@ class _ParticlesPainter extends CustomPainter {
     for (final p in particles) {
       final cx = p.x * size.width;
       final cy = p.y * size.height;
-      final s  = p.size;
+      final s = p.size;
 
       final bodyPaint = Paint()
         ..color = kBlue.withOpacity(p.opacity)
