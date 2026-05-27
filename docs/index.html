@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clausura Proyecto Libélula</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --dark: #0d0d0d;
+      --dark-2: #1a1a2e;
+      --dark-3: #16213e;
+      --text: #f0ece4;
+      --text-muted: #a89f8c;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Fondo con partículas animadas ── */
+    .bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: radial-gradient(ellipse at 20% 50%, #1a1a3e 0%, var(--dark) 60%),
+                  radial-gradient(ellipse at 80% 20%, #16213e 0%, transparent 50%);
+    }
+
+    .dragonfly-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cellipse cx='100' cy='100' rx='4' ry='60' fill='%23c9a84c'/%3E%3Cellipse cx='100' cy='80' rx='60' ry='12' fill='%23c9a84c' opacity='.7'/%3E%3Cellipse cx='100' cy='110' rx='45' ry='9' fill='%23c9a84c' opacity='.5'/%3E%3Ccircle cx='100' cy='48' r='8' fill='%23c9a84c'/%3E%3C/svg%3E");
+      background-size: 300px 300px;
+      background-repeat: repeat;
+      animation: bgDrift 30s linear infinite;
+    }
+
+    @keyframes bgDrift {
+      from { background-position: 0 0; }
+      to   { background-position: 300px 300px; }
+    }
+
+    /* ── Partículas de luz ── */
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--gold-light);
+      opacity: 0;
+      animation: floatUp var(--dur) ease-in infinite;
+      animation-delay: var(--delay);
+      width: var(--size);
+      height: var(--size);
+      left: var(--x);
+    }
+
+    @keyframes floatUp {
+      0%   { opacity: 0; transform: translateY(100vh) scale(0); }
+      20%  { opacity: 0.6; }
+      80%  { opacity: 0.3; }
+      100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+    }
+
+    /* ── Layout principal ── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── Cabecera ── */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 0.35rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+      animation: fadeDown 0.8s ease both;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 7vw, 5rem);
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 60%, #a07830 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeDown 0.9s ease 0.1s both;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+      color: var(--text-muted);
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      animation: fadeDown 1s ease 0.2s both;
+    }
+
+    /* ── Línea decorativa ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem auto;
+      width: 100%;
+      max-width: 400px;
+      animation: fadeIn 1s ease 0.4s both;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+
+    .divider::after {
+      background: linear-gradient(to left, transparent, var(--gold));
+    }
+
+    .divider-icon {
+      font-size: 1.2rem;
+      color: var(--gold);
+    }
+
+    /* ── Card de hero ── */
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      animation: fadeUp 1s ease 0.3s both;
+      box-shadow: 0 0 60px rgba(201, 168, 76, 0.06), 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    /* ── Hero image placeholder ── */
+    .hero-img-wrap {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto 2rem;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      background: rgba(255,255,255,0.04);
+      border: 1px dashed rgba(201,168,76,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-img-wrap .placeholder-icon {
+      font-size: 2.5rem;
+      opacity: 0.5;
+    }
+
+    /* ── Info del evento ── */
+    .event-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .event-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .event-row .icon { font-size: 1.1rem; }
+    .event-row strong { color: var(--text); font-weight: 500; }
+
+    /* ── Formulario ── */
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+      text-align: left;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 12px;
+      padding: 0.85rem 1.1rem;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input[type="text"]::placeholder { color: var(--text-muted); }
+
+    input[type="text"]:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+    }
+
+    /* ── Botón ── */
+    .btn-confirm {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: #1a1200;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s, opacity 0.2s;
+      box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+      text-decoration: none;
+    }
+
+    .btn-confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(201,168,76,0.5);
+    }
+
+    .btn-confirm:active { transform: translateY(0); }
+
+    .btn-confirm svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      opacity: 0.6;
+      animation: fadeIn 1.2s ease 0.6s both;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Animaciones ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .card { padding: 2rem 1.25rem; border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-canvas"></div>
+  <div class="dragonfly-bg"></div>
+
+  <!-- Partículas -->
+  <div class="particles" id="particles"></div>
+
+  <div class="wrapper">
+
+    <header class="header">
+      <span class="tag">✦ Evento especial</span>
+      <h1>Proyecto Libélula</h1>
+      <p class="subtitle">Ceremonia de Clausura</p>
+    </header>
+
+    <div class="divider"><span class="divider-icon">🪲</span></div>
+
+    <div class="card">
+
+      <!-- Hero image — reemplaza con tu imagen real -->
+      <div class="hero-img-wrap" id="heroWrap">
+        <!-- Para usar tu imagen, descomenta la línea de abajo y borra el placeholder -->
+        <!-- <img src="assets/hero.jpg" alt="Clausura Proyecto Libélula" /> -->
+        <span class="placeholder-icon">🖼️</span>
+        <span>Agrega tu imagen aquí</span>
+      </div>
+
+      <!-- Detalles del evento -->
+      <div class="event-info">
+        <div class="event-row">
+          <span class="icon">📅</span>
+          <span>Próximamente — <strong>2026</strong></span>
+        </div>
+        <div class="event-row">
+          <span class="icon">📍</span>
+          <span>Por confirmar</span>
+        </div>
+        <div class="event-row">
+          <span class="icon">🕐</span>
+          <span>Por confirmar</span>
+        </div>
+      </div>
+
+      <!-- Formulario de asistencia -->
+      <div class="form-group">
+        <label class="form-label" for="nameInput">Tu nombre</label>
+        <input
+          type="text"
+          id="nameInput"
+          placeholder="¿Cómo te llamas?"
+          autocomplete="off"
+        />
+      </div>
+
+      <button class="btn-confirm" onclick="confirmarAsistencia()">
+        <!-- Ícono de WhatsApp -->
+        <svg viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16.004 2.667C8.64 2.667 2.667 8.64 2.667 16c0 2.363.627 4.587 1.72 6.517L2.667 29.333l6.987-1.693A13.28 13.28 0 0 0 16.004 29.333c7.36 0 13.329-5.973 13.329-13.333S23.364 2.667 16.004 2.667Zm0 2.4a10.92 10.92 0 0 1 10.929 10.933 10.92 10.92 0 0 1-10.929 10.933 10.89 10.89 0 0 1-5.613-1.547l-.4-.24-4.147 1.04 1.093-3.987-.267-.413A10.893 10.893 0 0 1 5.067 16a10.92 10.92 0 0 1 10.937-10.933Zm-3.6 5.44c-.213 0-.56.08-.853.4-.293.32-1.12 1.093-1.12 2.667s1.147 3.093 1.307 3.307c.16.213 2.24 3.547 5.493 4.827 2.72 1.08 3.253.853 3.84.8.587-.053 1.893-.773 2.16-1.52.267-.747.267-1.387.187-1.52-.08-.133-.293-.213-.613-.373-.32-.16-1.893-.933-2.187-1.04-.293-.107-.507-.16-.72.16-.213.32-.827 1.04-.987 1.253-.16.213-.32.24-.64.08-.32-.16-1.36-.5-2.587-1.587-.96-.853-1.6-1.907-1.787-2.227-.187-.32-.013-.493.147-.653.147-.147.32-.373.48-.56.16-.187.213-.32.32-.533.107-.213.053-.4-.027-.56-.08-.16-.72-1.733-.987-2.373-.24-.587-.493-.507-.68-.52-.173-.013-.373-.013-.587-.013Z"/>
+        </svg>
+        Confirmar asistencia
+      </button>
+
+    </div>
+
+    <footer class="footer">
+      <p>Proyecto Libélula · 2026</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // ── Partículas de luz ──────────────────────────────────────────
+    (function () {
+      const container = document.getElementById('particles');
+      const count = 25;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 4 + 2;
+        p.style.setProperty('--size', size + 'px');
+        p.style.setProperty('--x', Math.random() * 100 + '%');
+        p.style.setProperty('--dur', (Math.random() * 10 + 8) + 's');
+        p.style.setProperty('--delay', (Math.random() * 12) + 's');
+        container.appendChild(p);
+      }
+    })();
+
+    // ── Confirmar asistencia vía WhatsApp ─────────────────────────
+    function confirmarAsistencia() {
+      const input = document.getElementById('nameInput');
+      const nombre = input.value.trim();
+
+      if (!nombre) {
+        input.focus();
+        input.style.borderColor = '#e05c5c';
+        input.style.boxShadow = '0 0 0 3px rgba(224,92,92,0.2)';
+        setTimeout(() => {
+          input.style.borderColor = '';
+          input.style.boxShadow = '';
+        }, 2000);
+        return;
+      }
+
+      const mensaje = encodeURIComponent(
+        `¡Hola! Soy *${nombre}* y confirmo mi asistencia a la Clausura del Proyecto Libélula. 🪲✨`
+      );
+      const telefono = '573103799897'; // +57 Colombia
+      window.open(`https://wa.me/${telefono}?text=${mensaje}`, '_blank');
+    }
+
+    // Permitir confirmar con Enter
+    document.getElementById('nameInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') confirmarAsistencia();
+    });
+  </script>
+
+</body>
+</html>
