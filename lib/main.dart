@@ -645,35 +645,82 @@ class _ParticlesLayerState extends State<ParticlesLayer>
 }
 
 class _Particle {
-  double x, y, size, speed, opacity;
+  double x, y, size, speed, opacity, angle, drift;
   _Particle(
       {required this.x,
       required this.y,
       required this.size,
       required this.speed,
-      required this.opacity});
+      required this.opacity,
+      required this.angle,
+      required this.drift});
   factory _Particle.random(Random rng) => _Particle(
-      x: rng.nextDouble(), y: rng.nextDouble(),
-      size: rng.nextDouble() * 3 + 1.5,
-      speed: rng.nextDouble() * 0.002 + 0.0008,
-      opacity: rng.nextDouble() * 0.4 + 0.1);
-  void update() { y -= speed; if (y < -0.02) y = 1.02; }
+      x: rng.nextDouble(),
+      y: rng.nextDouble(),
+      size: rng.nextDouble() * 7 + 5,        // 5–12 px
+      speed: rng.nextDouble() * 0.0015 + 0.0006,
+      opacity: rng.nextDouble() * 0.35 + 0.12,
+      angle: rng.nextDouble() * 2 * pi,
+      drift: (rng.nextDouble() - 0.5) * 0.0006);
+  void update() {
+    y -= speed;
+    x += drift;
+    angle += 0.03;
+    if (y < -0.05) { y = 1.05; x = Random().nextDouble(); }
+    if (x < -0.05) x = 1.05;
+    if (x > 1.05)  x = -0.05;
+  }
 }
 
 class _ParticlesPainter extends CustomPainter {
   final List<_Particle> particles;
   _ParticlesPainter(this.particles);
+
+  // Dibuja una libélula minimalista centrada en (0,0) de tamaño ~1
+  void _drawDragonfly(Canvas canvas, Paint bodyPaint, Paint wingPaint) {
+    // cuerpo
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(-0.08, -0.5, 0.16, 1.0),
+        const Radius.circular(0.08),
+      ),
+      bodyPaint,
+    );
+    // alas superiores (2 elipses)
+    canvas.drawOval(
+        const Rect.fromLTWH(-0.7, -0.55, 0.62, 0.28), wingPaint);
+    canvas.drawOval(
+        const Rect.fromLTWH(0.08, -0.55, 0.62, 0.28), wingPaint);
+    // alas inferiores
+    canvas.drawOval(
+        const Rect.fromLTWH(-0.55, -0.22, 0.47, 0.22), wingPaint);
+    canvas.drawOval(
+        const Rect.fromLTWH(0.08, -0.22, 0.47, 0.22), wingPaint);
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     for (final p in particles) {
-      canvas.drawCircle(
-          Offset(p.x * size.width, p.y * size.height),
-          p.size,
-          Paint()
-            ..color = kBlueMid.withOpacity(p.opacity * 0.15)
-            ..style = PaintingStyle.fill);
+      final cx = p.x * size.width;
+      final cy = p.y * size.height;
+      final s  = p.size;
+
+      final bodyPaint = Paint()
+        ..color = kBlue.withOpacity(p.opacity)
+        ..style = PaintingStyle.fill;
+      final wingPaint = Paint()
+        ..color = kBlueMid.withOpacity(p.opacity * 0.45)
+        ..style = PaintingStyle.fill;
+
+      canvas.save();
+      canvas.translate(cx, cy);
+      canvas.rotate(p.angle);
+      canvas.scale(s);
+      _drawDragonfly(canvas, bodyPaint, wingPaint);
+      canvas.restore();
     }
   }
+
   @override
   bool shouldRepaint(_ParticlesPainter old) => true;
 }
