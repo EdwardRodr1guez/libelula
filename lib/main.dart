@@ -457,44 +457,6 @@ class _InvitationCard extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Campo nombre
-          const Text(
-            'TU NOMBRE',
-            style: TextStyle(
-              fontSize: 11,
-              letterSpacing: 2.5,
-              color: kBlue,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: nameCtrl,
-            style: const TextStyle(color: kInk, fontSize: 16),
-            onSubmitted: (_) => onConfirm(),
-            decoration: InputDecoration(
-              hintText: '¿Cómo te llamas?',
-              hintStyle: const TextStyle(color: kMuted),
-              filled: true,
-              fillColor: kBlueLight.withOpacity(0.5),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 16,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: nameError
-                      ? const Color(0xFFE05C5C)
-                      : kBlueMid.withOpacity(0.3),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: kBlue, width: 1.8),
-              ),
-            ),
-          ),
           const SizedBox(height: 18),
 
           // Botón
