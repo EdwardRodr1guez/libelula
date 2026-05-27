@@ -12,70 +12,75 @@ class LibelulaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Clausura Proyecto Libélula',
+      title: 'Libélula · Confirmación de asistencia',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: const ColorScheme.dark(),
+        colorScheme: ColorScheme.fromSeed(seedColor: kBlue),
         fontFamily: 'sans-serif',
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: const LandingPage(),
     );
   }
 }
 
-// ── Colores ────────────────────────────────────────────────────────────
-const Color kGold = Color(0xFFC9A84C);
-const Color kGoldLight = Color(0xFFE8C97A);
-const Color kBackground = Color(0xFFF7F2E8);
-const Color kSurface = Color(0xFFFFFDF8);
-const Color kInk = Color(0xFF2B2620);
-const Color kTextMuted = Color(0xFF7E7668);
+// ── Paleta azul / blanco ──────────────────────────────────────────────
+const Color kBlue      = Color(0xFF1565C0);
+const Color kBlueMid   = Color(0xFF1E88E5);
+const Color kBlueLight = Color(0xFFE3F2FD);
+const Color kWhite     = Colors.white;
+const Color kInk       = Color(0xFF0D1B2A);
+const Color kMuted     = Color(0xFF607D8B);
 
 // ── Landing Page ──────────────────────────────────────────────────────
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
-
   @override
   State<LandingPage> createState() => _LandingPageState();
 }
 
 class _LandingPageState extends State<LandingPage>
-    with TickerProviderStateMixin {
-  final TextEditingController _nameController = TextEditingController();
+    with SingleTickerProviderStateMixin {
+  final TextEditingController _nameCtrl = TextEditingController();
+  final ScrollController _scrollCtrl   = ScrollController();
   bool _nameError = false;
+  double _parallaxOffset = 0;
 
   late final AnimationController _fadeCtrl;
-  late final Animation<double> _fadeAnim;
+  late final Animation<double>   _fadeAnim;
 
   @override
   void initState() {
     super.initState();
     _fadeCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..forward();
+        vsync: this, duration: const Duration(milliseconds: 1000))
+      ..forward();
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
+    _scrollCtrl.addListener(() {
+      if (mounted) setState(() => _parallaxOffset = _scrollCtrl.offset * 0.35);
+    });
   }
 
   @override
   void dispose() {
     _fadeCtrl.dispose();
-    _nameController.dispose();
+    _scrollCtrl.dispose();
+    _nameCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _confirmar() async {
-    final nombre = _nameController.text.trim();
+    final nombre = _nameCtrl.text.trim();
     if (nombre.isEmpty) {
       setState(() => _nameError = true);
-      Future.delayed(
-        const Duration(seconds: 2),
-        () => setState(() => _nameError = false),
-      );
+      Future.delayed(const Duration(seconds: 2),
+          () { if (mounted) setState(() => _nameError = false); });
       return;
     }
     final msg = Uri.encodeComponent(
-      '¡Hola! Soy *$nombre* y confirmo mi asistencia a la Clausura del Proyecto Libélula. 🪲✨',
+      '¡Hola! Soy *$nombre* y confirmo mi asistencia a la '
+      'Clausura del Programa de Educación Emocional — Proyecto Libélula 🪲✨\n'
+      'Fecha: Lunes 22 de junio 2026 · 1:30 pm',
     );
     final uri = Uri.parse('https://wa.me/573118888534?text=$msg');
     if (await canLaunchUrl(uri)) await launchUrl(uri);
@@ -84,80 +89,92 @@ class _LandingPageState extends State<LandingPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackground,
+      backgroundColor: kWhite,
       body: Stack(
         children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFFFFFBF4), kBackground],
-              ),
-            ),
-          ),
-          const _SoftOrbs(),
+          const _BackgroundOrbs(),
           const ParticlesLayer(),
           SafeArea(
             child: FadeTransition(
               opacity: _fadeAnim,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                controller: _scrollCtrl,
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 760),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const _BrandBar(),
-                        const SizedBox(height: 18),
-                        _HeroDetailImage(),
-                        const SizedBox(height: 18),
-                        _Tag(),
-                        const SizedBox(height: 16),
-                        ShaderMask(
-                          shaderCallback: (bounds) => const LinearGradient(
-                            colors: [Color(0xFFB8892C), kGold, Color(0xFF6E531A)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ).createShader(bounds),
-                          child: const Text(
-                            'Proyecto\nLibélula',
+                        // PARALLAX HERO
+                        _ParallaxHero(offset: _parallaxOffset),
+                        // BRAND BAR
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                          child: _BrandBar(),
+                        ),
+                        // TÍTULO
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 18),
+                          child: Column(
+                            children: [
+                              const _ChipTag(label: '✦  Evento especial'),
+                              const SizedBox(height: 14),
+                              const Text(
+                                'Proyecto Libélula',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.w900,
+                                  color: kBlue,
+                                  height: 1.05,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              const Text(
+                                'Clausura del Programa de Educación Emocional',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: kMuted,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const _BlueDivider(),
+                        const SizedBox(height: 22),
+                        // CARD
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: _InvitationCard(
+                            nameCtrl: _nameCtrl,
+                            nameError: _nameError,
+                            onConfirm: _confirmar,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // PATROCINADORES
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: _PatrocinadoresSection(),
+                        ),
+                        const SizedBox(height: 24),
+                        // FOOTER
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: _FooterBanner(),
+                        ),
+                        const SizedBox(height: 28),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 24),
+                          child: Text(
+                            'Proyecto Libélula · 2026',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 54,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              height: 1.05,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Ceremonia de Clausura',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: kTextMuted,
-                            letterSpacing: 1.2,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        const SizedBox(height: 22),
-                        _GoldDivider(),
-                        const SizedBox(height: 22),
-                        _InvitationCard(
-                          nameController: _nameController,
-                          nameError: _nameError,
-                          onConfirm: _confirmar,
-                        ),
-                        const SizedBox(height: 18),
-                        const _FooterBanner(),
-                        const SizedBox(height: 18),
-                        const Text(
-                          'Proyecto Libélula · 2026',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: kTextMuted,
-                            letterSpacing: 1,
+                                fontSize: 12, color: kMuted, letterSpacing: 1),
                           ),
                         ),
                       ],
@@ -173,379 +190,429 @@ class _LandingPageState extends State<LandingPage>
   }
 }
 
-// ── Tag de evento ──────────────────────────────────────────────────────
-class _Tag extends StatelessWidget {
+// ── Parallax Hero ─────────────────────────────────────────────────────
+class _ParallaxHero extends StatelessWidget {
+  const _ParallaxHero({required this.offset});
+  final double offset;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        border: Border.all(color: kGold.withOpacity(0.7)),
-        borderRadius: BorderRadius.circular(100),
-        color: Colors.white.withOpacity(0.72),
-      ),
-      child: const Text(
-        '✦  Evento especial',
-        style: TextStyle(
-          fontSize: 11,
-          letterSpacing: 3,
-          color: kGold,
-          fontWeight: FontWeight.w500,
+    final h = MediaQuery.of(context).size.height * 0.45;
+    return SizedBox(
+      height: h,
+      child: ClipRect(
+        child: OverflowBox(
+          maxHeight: h + 120,
+          child: Transform.translate(
+            offset: Offset(0, -offset),
+            child: Image.asset('assets/landscape2.jpeg',
+                fit: BoxFit.cover, width: double.infinity, height: h + 120),
+          ),
         ),
       ),
     );
   }
 }
 
-// ── Divisor dorado ────────────────────────────────────────────────────
-class _GoldDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            height: 1,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.transparent, kGold],
-              ),
-            ),
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text('🪲', style: TextStyle(fontSize: 18)),
-        ),
-        Expanded(
-          child: Container(
-            height: 1,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [kGold, Colors.transparent],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ── Card de invitación ────────────────────────────────────────────────
-class _InvitationCard extends StatelessWidget {
-  const _InvitationCard({
-    required this.nameController,
-    required this.nameError,
-    required this.onConfirm,
-  });
-
-  final TextEditingController nameController;
-  final bool nameError;
-  final VoidCallback onConfirm;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: kSurface.withOpacity(0.96),
-        border: Border.all(color: kGold.withOpacity(0.22)),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: kGold.withOpacity(0.10),
-            blurRadius: 50,
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 30,
-            offset: const Offset(0, 14),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _LogoStrip(),
-          const SizedBox(height: 18),
-          _HeroDetailImage(),
-          const SizedBox(height: 24),
-          // Info del evento
-          _EventRow(icon: '📅', label: 'Próximamente', value: '2026'),
-          const SizedBox(height: 10),
-          _EventRow(icon: '📍', label: 'Lugar', value: 'Por confirmar'),
-          const SizedBox(height: 10),
-          _EventRow(icon: '🕐', label: 'Hora', value: 'Por confirmar'),
-          const SizedBox(height: 28),
-          // Label
-          const Text(
-            'TU NOMBRE',
-            style: TextStyle(
-              fontSize: 11,
-              letterSpacing: 2.5,
-              color: kGold,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Input
-          TextField(
-            controller: nameController,
-            style: const TextStyle(color: kInk, fontSize: 16),
-            onSubmitted: (_) => onConfirm(),
-            decoration: InputDecoration(
-              hintText: '¿Cómo te llamas?',
-              hintStyle: const TextStyle(color: kTextMuted),
-              filled: true,
-              fillColor: const Color(0xFFFFFCF8),
-              contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 18, vertical: 16),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: nameError
-                      ? const Color(0xFFE05C5C)
-                      : kGold.withOpacity(0.28),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: kGold, width: 1.5),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Botón
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton.icon(
-              onPressed: onConfirm,
-              icon: const _WhatsAppIcon(),
-              label: const Text(
-                'Confirmar asistencia',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kGold,
-                foregroundColor: const Color(0xFF1A1200),
-                elevation: 8,
-                shadowColor: kGold.withOpacity(0.4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Hero image y logos ────────────────────────────────────────────────
-class _HeroDetailImage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 240,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: kGold.withOpacity(0.22),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.asset(
-          'assets/landscape.jpeg',
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-        ),
-      ),
-    );
-  }
-}
-
+// ── Brand Bar ─────────────────────────────────────────────────────────
 class _BrandBar extends StatelessWidget {
-  const _BrandBar();
-
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _MiniLogo(asset: 'assets/logo1.jpeg'),
-        const SizedBox(width: 12),
-        _MiniLogo(asset: 'assets/logo2.jpeg'),
+        _logoBox('assets/logo1.jpeg', 72),
+        const SizedBox(width: 14),
+        _logoBox('assets/logo2.jpeg', 54),
         const Spacer(),
-        const Text(
-          'Clausura',
-          style: TextStyle(
-            color: kTextMuted,
-            fontSize: 12,
-            letterSpacing: 2,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        const Text('Clausura · 2026',
+            style: TextStyle(
+                color: kMuted,
+                fontSize: 12,
+                letterSpacing: 1.5,
+                fontWeight: FontWeight.w500)),
       ],
     );
   }
-}
 
-class _LogoStrip extends StatelessWidget {
-  const _LogoStrip();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Expanded(child: _MiniLogo(asset: 'assets/logo1.jpeg', height: 68)),
-        SizedBox(width: 12),
-        Expanded(child: _MiniLogo(asset: 'assets/logo2.jpeg', height: 68)),
-      ],
-    );
-  }
-}
-
-class _MiniLogo extends StatelessWidget {
-  const _MiniLogo({required this.asset, this.height = 42});
-
-  final String asset;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _logoBox(String asset, double h) {
     return Container(
-      height: height,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      height: h,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: kWhite,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kGold.withOpacity(0.16)),
+        border: Border.all(color: kBlueLight),
+        boxShadow: [
+          BoxShadow(
+              color: kBlue.withOpacity(0.10),
+              blurRadius: 14,
+              offset: const Offset(0, 4))
+        ],
       ),
       child: Image.asset(asset, fit: BoxFit.contain),
     );
   }
 }
 
-class _FooterBanner extends StatelessWidget {
-  const _FooterBanner();
-
+// ── Chip tag ──────────────────────────────────────────────────────────
+class _ChipTag extends StatelessWidget {
+  const _ChipTag({required this.label});
+  final String label;
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: 110,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kGold.withOpacity(0.16)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: kBlueLight,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: kBlueMid.withOpacity(0.35)),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Image.asset(
-          'assets/footer.jpeg',
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-        ),
+      child: Text(label,
+          style: const TextStyle(
+              fontSize: 11,
+              letterSpacing: 2.5,
+              color: kBlue,
+              fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+// ── Divisor azul ──────────────────────────────────────────────────────
+class _BlueDivider extends StatelessWidget {
+  const _BlueDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Expanded(
+              child: Container(
+                  height: 1.5,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                    Colors.transparent,
+                    kBlueMid.withOpacity(0.4)
+                  ])))),
+          const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 14),
+              child: Text('🪲', style: TextStyle(fontSize: 20))),
+          Expanded(
+              child: Container(
+                  height: 1.5,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                    kBlueMid.withOpacity(0.4),
+                    Colors.transparent
+                  ])))),
+        ],
       ),
     );
   }
 }
 
-// ── Fila de info del evento ───────────────────────────────────────────
-class _EventRow extends StatelessWidget {
-  const _EventRow(
-      {required this.icon, required this.label, required this.value});
-  final String icon;
-  final String label;
-  final String value;
+// ── Card de invitación ────────────────────────────────────────────────
+class _InvitationCard extends StatelessWidget {
+  const _InvitationCard(
+      {required this.nameCtrl,
+      required this.nameError,
+      required this.onConfirm});
+  final TextEditingController nameCtrl;
+  final bool nameError;
+  final VoidCallback onConfirm;
 
   @override
   Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: kBlue.withOpacity(0.12)),
+        boxShadow: [
+          BoxShadow(
+              color: kBlue.withOpacity(0.08),
+              blurRadius: 40,
+              offset: const Offset(0, 12))
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Imagen interior (landscape original)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset('assets/landscape.jpeg',
+                width: double.infinity, height: 220, fit: BoxFit.cover),
+          ),
+          const SizedBox(height: 22),
+
+          // Texto de invitación
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+                color: kBlueLight,
+                borderRadius: BorderRadius.circular(14)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text('Estimado equipo,',
+                    style: TextStyle(
+                        color: kBlue,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15)),
+                SizedBox(height: 8),
+                Text(
+                  'Es un gusto invitarlos a la clausura del Programa de '
+                  'Educación Emocional realizado con los pacientes y cuidadores '
+                  'del Proyecto Libélula.\n\n'
+                  'Queremos compartir los avances de este proceso y nos '
+                  'encantaría contar con su presencia en el evento de cierre.',
+                  style: TextStyle(color: kInk, fontSize: 14, height: 1.6),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Detalles
+          const _EventDetail(
+              icon: '📅',
+              label: 'Fecha',
+              value: 'Lunes 22 de junio 2026'),
+          const SizedBox(height: 10),
+          const _EventDetail(
+              icon: '🕐', label: 'Hora', value: '1:30 pm – 4:00 pm'),
+          const SizedBox(height: 10),
+          const _EventDetail(
+            icon: '📍',
+            label: 'Lugar',
+            value:
+                'Auditorio 2° piso · Hospital de Bosa\n(Cl. 73 Sur #KR 103)',
+          ),
+          const SizedBox(height: 20),
+
+          // Deadline
+          Container(
+            width: double.infinity,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFECB3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                  color: const Color(0xFFFFB300).withOpacity(0.5)),
+            ),
+            child: const Row(
+              children: [
+                Text('⏰', style: TextStyle(fontSize: 18)),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Por favor confirme asistencia antes del 5 de junio 2026',
+                    style: TextStyle(
+                        color: Color(0xFF7B4F00),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Campo nombre
+          const Text('TU NOMBRE',
+              style: TextStyle(
+                  fontSize: 11,
+                  letterSpacing: 2.5,
+                  color: kBlue,
+                  fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: nameCtrl,
+            style: const TextStyle(color: kInk, fontSize: 16),
+            onSubmitted: (_) => onConfirm(),
+            decoration: InputDecoration(
+              hintText: '¿Cómo te llamas?',
+              hintStyle: const TextStyle(color: kMuted),
+              filled: true,
+              fillColor: kBlueLight.withOpacity(0.5),
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 18, vertical: 16),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                    color: nameError
+                        ? const Color(0xFFE05C5C)
+                        : kBlueMid.withOpacity(0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide:
+                    const BorderSide(color: kBlue, width: 1.8),
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Botón
+          SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: ElevatedButton.icon(
+              onPressed: onConfirm,
+              icon: const Icon(Icons.chat_rounded,
+                  size: 20, color: Colors.white),
+              label: const Text('Confirmar asistencia',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.4)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kBlue,
+                foregroundColor: kWhite,
+                elevation: 6,
+                shadowColor: kBlue.withOpacity(0.4),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Event detail row ──────────────────────────────────────────────────
+class _EventDetail extends StatelessWidget {
+  const _EventDetail(
+      {required this.icon, required this.label, required this.value});
+  final String icon, label, value;
+  @override
+  Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(icon, style: const TextStyle(fontSize: 18)),
         const SizedBox(width: 10),
-        Text(
-          '$label: ',
-          style: const TextStyle(color: kTextMuted, fontSize: 14),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-              color: kInk, fontSize: 14, fontWeight: FontWeight.w600),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(fontSize: 14, height: 1.5),
+              children: [
+                TextSpan(
+                    text: '$label: ',
+                    style: const TextStyle(color: kMuted)),
+                TextSpan(
+                    text: value,
+                    style: const TextStyle(
+                        color: kInk, fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
         ),
       ],
     );
   }
 }
 
-// ── Ícono WhatsApp ────────────────────────────────────────────────────
-class _WhatsAppIcon extends StatelessWidget {
-  const _WhatsAppIcon();
-
+// ── Patrocinadores ────────────────────────────────────────────────────
+class _PatrocinadoresSection extends StatelessWidget {
+  const _PatrocinadoresSection();
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(20, 20),
-      painter: _WhatsAppPainter(),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: kBlueLight,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kBlueMid.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          const Text('PATROCINADORES',
+              style: TextStyle(
+                  fontSize: 11,
+                  letterSpacing: 3,
+                  color: kBlue,
+                  fontWeight: FontWeight.w700)),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset('assets/patrocinadores1.jpeg',
+                        height: 90, fit: BoxFit.contain)),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset('assets/patrocinadores2.jpeg',
+                        height: 90, fit: BoxFit.contain)),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _WhatsAppPainter extends CustomPainter {
+// ── Footer banner ─────────────────────────────────────────────────────
+class _FooterBanner extends StatelessWidget {
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF1A1200)
-      ..style = PaintingStyle.fill;
-    final path = Path();
-    // Círculo exterior
-    canvas.drawCircle(Offset(size.width / 2, size.height / 2),
-        size.width / 2, paint);
-    final innerPaint = Paint()
-      ..color = kGold
-      ..style = PaintingStyle.fill;
-    // Burbuja de chat simplificada
-    path.addOval(Rect.fromCircle(
-        center: Offset(size.width / 2, size.height / 2),
-        radius: size.width * 0.38));
-    canvas.drawPath(path, innerPaint);
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Image.asset('assets/footer.jpeg',
+          width: double.infinity, height: 120, fit: BoxFit.cover),
+    );
   }
-
-  @override
-  bool shouldRepaint(_) => false;
 }
 
-// ── Capa de partículas ────────────────────────────────────────────────
+// ── Fondo orbs ───────────────────────────────────────────────────────
+class _BackgroundOrbs extends StatelessWidget {
+  const _BackgroundOrbs();
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Stack(
+        children: [
+          Container(color: kWhite),
+          _orb(-100, null, -80, null, 260),
+          _orb(400, null, null, -100, 200),
+          _orb(null, 80, -60, null, 180),
+        ],
+      ),
+    );
+  }
+
+  Widget _orb(double? top, double? bottom, double? right, double? left,
+      double size) {
+    return Positioned(
+      top: top,
+      bottom: bottom,
+      right: right,
+      left: left,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+              colors: [kBlueLight, Colors.transparent]),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Partículas ────────────────────────────────────────────────────────
 class ParticlesLayer extends StatefulWidget {
   const ParticlesLayer({super.key});
-
   @override
   State<ParticlesLayer> createState() => _ParticlesLayerState();
 }
@@ -559,35 +626,22 @@ class _ParticlesLayerState extends State<ParticlesLayer>
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < 20; i++) {
-      _particles.add(_Particle.random(_rng));
-    }
+    for (int i = 0; i < 18; i++) _particles.add(_Particle.random(_rng));
     _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..repeat();
+        vsync: this, duration: const Duration(seconds: 1))
+      ..repeat();
     _ctrl.addListener(() {
-      setState(() {
-        for (var p in _particles) {
-          p.update();
-        }
-      });
+      if (mounted) setState(() { for (var p in _particles) p.update(); });
     });
   }
 
   @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
+  void dispose() { _ctrl.dispose(); super.dispose(); }
 
   @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
+  Widget build(BuildContext context) => CustomPaint(
       painter: _ParticlesPainter(_particles),
-      child: const SizedBox.expand(),
-    );
-  }
+      child: const SizedBox.expand());
 }
 
 class _Particle {
@@ -598,74 +652,28 @@ class _Particle {
       required this.size,
       required this.speed,
       required this.opacity});
-
   factory _Particle.random(Random rng) => _Particle(
-        x: rng.nextDouble(),
-        y: rng.nextDouble(),
-        size: rng.nextDouble() * 3 + 1.5,
-        speed: rng.nextDouble() * 0.002 + 0.0008,
-        opacity: rng.nextDouble() * 0.5 + 0.1,
-      );
-
-  void update() {
-    y -= speed;
-    if (y < -0.02) y = 1.02;
-  }
+      x: rng.nextDouble(), y: rng.nextDouble(),
+      size: rng.nextDouble() * 3 + 1.5,
+      speed: rng.nextDouble() * 0.002 + 0.0008,
+      opacity: rng.nextDouble() * 0.4 + 0.1);
+  void update() { y -= speed; if (y < -0.02) y = 1.02; }
 }
 
 class _ParticlesPainter extends CustomPainter {
   final List<_Particle> particles;
   _ParticlesPainter(this.particles);
-
   @override
   void paint(Canvas canvas, Size size) {
     for (final p in particles) {
-      final paint = Paint()
-        ..color = kGold.withOpacity(p.opacity * 0.20)
-        ..style = PaintingStyle.fill;
       canvas.drawCircle(
-          Offset(p.x * size.width, p.y * size.height), p.size, paint);
+          Offset(p.x * size.width, p.y * size.height),
+          p.size,
+          Paint()
+            ..color = kBlueMid.withOpacity(p.opacity * 0.15)
+            ..style = PaintingStyle.fill);
     }
   }
-
   @override
   bool shouldRepaint(_ParticlesPainter old) => true;
 }
-
-class _SoftOrbs extends StatelessWidget {
-  const _SoftOrbs();
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Stack(
-        children: [
-          Positioned(
-            top: -80,
-            right: -40,
-            child: _orb(180),
-          ),
-          Positioned(
-            top: 220,
-            left: -70,
-            child: _orb(140),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _orb(double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [kGold.withOpacity(0.18), Colors.transparent],
-        ),
-      ),
-    );
-  }
-}
-
